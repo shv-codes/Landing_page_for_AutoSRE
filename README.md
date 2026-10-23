@@ -1,234 +1,116 @@
-# AutoSRE — Team Zero-Ops
+# AutoSRE — Landing Page
 
 ### From production incident to verified fix.
 
-AutoSRE is an AI-powered Site Reliability Engineering agent that investigates production incidents, mitigates supported database failures, identifies likely root causes, and uses a coding agent to generate and verify fixes in a sandbox.
+The official landing page for **AutoSRE**, an AI-powered Site Reliability Engineering agent designed to investigate incidents, identify likely root causes, generate and verify code fixes, and prepare pull requests for human review.
 
-It then opens a pull request, handles bounded repair attempts for failing CI or merge conflicts, and stops when the fix is ready for human review.
+🌐 **Live website:** [landing-page-for-auto-sre.vercel.app](https://landing-page-for-auto-sre.vercel.app)
 
-**Our principle: automate the investigation and repair loop. Keep the final merge under human control.**
+🔗 **Main project:** [zero-ops-autosre](https://github.com/shv-codes/zero-ops-autosre)
 
 ---
 
-## The problem
+## Overview
 
-When production breaks, engineers must correlate alerts, logs, database telemetry, Git history, code changes, tests, and pull requests—often under pressure.
+This repository contains the public-facing website for AutoSRE. It presents the product's purpose, capabilities, workflow, and technical approach through a modern, interactive web experience.
 
-AutoSRE connects these steps into one bounded workflow.
+The landing page is a separate frontend project; the incident investigation, coding agent, sandbox verification, and pull-request workflows live in the main AutoSRE repository.
 
-## How it works
+## Tech stack
 
-```mermaid
-flowchart TD
-    A[Production Alert] --> B[Collect Logs and Telemetry]
-    B --> C[Diagnose Incident]
-    C --> D[Mitigate Supported Failure]
-    D --> E[Identify Likely Faulty Commit]
-    E --> F[AI Coding Agent]
-    F --> G[Sandbox and Regression Tests]
-    G -->|Tests fail| F
-    G -->|Verified| H[Open Pull Request]
-    H --> I[Monitor CI and Conflicts]
-    I -->|Repairable| F
-    I -->|Ready| J[Human Review and Merge]
-    I -->|Budget Exhausted| K[Escalate to Human]
-```
-
-### Two closed feedback loops
-
-- **Fix loop:** investigate, edit, test, learn from failures, and retry within a bounded budget.
-- **PR repair loop:** monitor CI and merge conflicts, attempt repairs, and escalate unresolved failures.
-
-## Key features
-
-- **Incident diagnosis:** use database telemetry, logs, and diagnostic evidence.
-- **Root-cause correlation:** rank likely faulty commits using Git history and blame.
-- **AI-powered remediation:** investigate code, propose patches, and run tests through guarded tools.
-- **Sandbox verification:** require the regression test to fail against the original code and the project test suite to pass against the patch.
-- **PR automation:** create a reviewable fix and post-mortem, then attempt bounded repair rounds.
-- **Live incident dashboard:** inspect timelines, execution steps, diffs, sandbox runs, and audit records.
-- **Human-controlled delivery:** the agent does not perform the final merge.
-- **Honest execution modes:** distinguish live LLM runs from cached, replay, and fallback behavior.
-
-## Technology stack
-
-| Layer | Technologies |
+| Technology | Purpose |
 |---|---|
-| Backend | Python, Django 5, Django REST Framework |
-| Agent orchestration | LangGraph |
-| LLM providers | Groq, NVIDIA Nemotron |
-| Frontend | React, TypeScript, Vite |
-| Database | PostgreSQL 16 |
-| Sandbox | Docker |
-| Integrations | GitHub, local delivery provider |
-| Live updates | Server-Sent Events (SSE) |
+| React 19 | Component-based user interface |
+| TypeScript | Type-safe application code |
+| Vite | Development server and production build |
+| Tailwind CSS 4 | Styling infrastructure |
+| Framer Motion | UI animation and transitions |
+| Three.js | 3D graphics |
+| React Three Fiber | React-based 3D rendering |
+| React Three Drei | Helpers for Three.js scenes |
+| React Router | Client-side navigation |
+| Geist & Instrument Serif | Typography |
 
-Projects can specify build and test commands through `.autosre.yml`, with auto-detection for Python, Node.js, Go, and Java. PostgreSQL is the initial database integration.
+## Getting started
 
-## Safety by design
+### Prerequisites
 
-| Protection | Purpose |
-|---|---|
-| Restricted file changes | Limit edits to permitted files and new tests |
-| Patch-size limit | Enforce the configured 50-line source-change limit |
-| Secret handling | Scrub sensitive values and reject detected secrets in patches |
-| Risky-code checks | Detect configured dangerous patterns |
-| Regression verification | Validate the original failure and the proposed fix |
-| Bounded autonomy | Maximum 3 fix attempts and 5 PR repair rounds |
-| Isolated test execution | Docker restrictions, resource limits, and timeouts |
-| Human approval | Keep final merging under human control |
-| Escalation | Stop when safety checks or retry budgets are exhausted |
-
-**Security note:** Pattern-based guardrails are not a complete security boundary. The Docker runner provides the configured isolation controls; the subprocess fallback is not isolated and must not be used for untrusted code. Build and installation commands also require appropriate isolation.
-
-## Quick start
-
-### Requirements
-
-- Python 3.11+
-- Git 2.38+
-- Node.js 18+
-- Docker Desktop running
+- Node.js compatible with the installed Vite version
+- npm
+- Git
 
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/shv-codes/zero-ops-autosre.git
-cd zero-ops-autosre
+git clone https://github.com/shv-codes/Landing_page_for_AutoSRE.git
+cd Landing_page_for_AutoSRE
 ```
 
-### 2. Set up the environment
+### 2. Install dependencies
 
 ```bash
-python scripts/setup.py
+npm install
 ```
 
-### 3. Start AutoSRE
+### 3. Start the development server
 
 ```bash
-python scripts/dev.py
+npm run dev
 ```
 
-Open **http://127.0.0.1:5173**, then navigate to **Controls → Start incident**.
+Open the local URL printed by Vite in your terminal.
 
-### 4. Run the demo
+## Available commands
 
-```bash
-python scripts/demo.py --conflict --merge
-```
-
-This exercises the demo incident workflow, including a simulated teammate conflict and PR repair.
-
-**Important:** Without Docker, sandbox execution falls back to a non-isolated subprocess. Do not use that fallback to execute untrusted code.
-
-## Live LLM and GitHub integration
-
-Configure `.env` for live model execution:
-
-```dotenv
-AUTOSRE_MODE=live
-LLM_PROVIDER=groq
-GROQ_API_KEY=your_groq_api_key
-```
-
-For GitHub delivery, configure the appropriate GitHub App credentials:
-
-```dotenv
-DELIVERY_PROVIDER=github
-GITHUB_REPO=your-user/victim-service
-GITHUB_APP_ID=your_github_app_id
-GITHUB_APP_PRIVATE_KEY_PATH=secrets/github-app.pem
-TARGET_REPO_PATH=var/victim_repo_github
-```
-
-Then select **Controls → Connect GitHub**.
-
-See the [GitHub App setup guide](docs/GITHUB_APP_SETUP.md) for detailed instructions.
-
-Keep all credentials out of source control. If the LLM is unavailable and AutoSRE falls back to recorded decisions, report that run as a fallback—not as a successful live-AI run.
-
-## API overview
-
-The REST API is exposed under `/api/v1`.
-
-| Endpoint | Purpose |
+| Command | Description |
 |---|---|
-| `GET /health` | Health check |
-| `GET /system` | System and dependency status |
-| `POST /alerts` | Receive incident alerts |
-| `GET /incidents` | List incidents |
-| `GET /incidents/{id}` | Incident details and timeline |
-| `GET /incidents/{id}/stream` | Live updates through SSE |
-| `GET /incidents/{id}/diff` | Proposed code changes |
-| `GET /incidents/{id}/postmortem` | Incident post-mortem |
-| `GET /incidents/{id}/audit` | Audit trail |
-| `GET /guardrails` | Guardrail status |
-| `GET /telemetry/connections` | Database connection telemetry |
-| `GET /github/status` | GitHub integration status |
+| `npm run dev` | Start the local development server |
+| `npm run build` | Run TypeScript project checks and build for production |
+| `npm run lint` | Run Oxlint |
+| `npm run preview` | Preview the production build locally |
 
-Additional configuration, sandbox, and GitHub connection endpoints are available in the implementation.
-
-## Testing
-
-Run the backend tests:
+Before deploying changes, run:
 
 ```bash
-.venv/bin/python -m pytest backend
+npm run lint
+npm run build
 ```
 
-Run the victim-service tests:
-
-```bash
-.venv/bin/python -m pytest victim_service
-```
-
-On Windows, replace `.venv/bin/python` with `.venv\Scripts\python.exe`.
-
-Docker and PostgreSQL integration tests may be skipped if their required services are unavailable. Inspect the test report and skipped-test count before claiming that the full suite passed.
-
-## Repository structure
+## Project structure
 
 ```text
-zero-ops-autosre/
-├── backend/
-│   ├── agent/          # Agent pipeline and coding tools
-│   ├── correlation/    # Commit scoring and Git blame
-│   ├── diagnostics/    # Diagnosis and mitigation
-│   ├── delivery/       # Local and GitHub delivery
-│   ├── guardrails/     # Safety and patch validation
-│   ├── incidents/      # Incident lifecycle and API
-│   ├── sandbox/        # Docker runner and fallback
-│   ├── telemetry/      # Database adapters
-│   └── workspace/      # Repository and branch operations
-├── frontend/           # React + TypeScript dashboard
-├── victim_service/     # Demo application and tests
-├── infra/postgres/     # PostgreSQL configuration
-├── docs/               # Architecture and setup guides
-├── scripts/            # Setup, development, and demo scripts
-├── docker-compose.yml
+Landing_page_for_AutoSRE/
+├── public/          # Static assets
+├── src/             # Application source code
+├── index.html       # HTML entry point
+├── package.json     # Scripts and dependencies
+├── package-lock.json
+├── tsconfig.json    # TypeScript configuration
+├── vite.config.ts   # Vite configuration
 └── README.md
 ```
 
-## Documentation
+## Deployment
 
-- [Architecture and workflow](docs/HOW_IT_WORKS.md)
-- [Implementation plan](docs/IMPLEMENTATION_PLAN.md)
-- [GitHub App integration](docs/GITHUB_APP_SETUP.md)
+The live website is hosted on Vercel:
 
-## Limitations
+**[Open the AutoSRE landing page](https://landing-page-for-auto-sre.vercel.app)**
 
-AutoSRE is a hackathon-stage project. Its effectiveness depends on the quality of available telemetry, the supported incident type, project configuration, LLM behavior, permissions, and test coverage.
+To deploy an updated version, connect this GitHub repository to Vercel and configure the project using the standard Vite settings:
 
-- Root-cause correlation identifies likely causes; it does not prove causation.
-- Passing tests do not guarantee a defect-free patch.
-- Pattern-based checks cannot detect every dangerous change.
-- Automatic remediation is limited to supported scenarios.
-- Live AI, replay, and fallback runs must be evaluated separately.
-- Unsafe or unresolved incidents require human investigation.
+- **Framework preset:** Vite
+- **Build command:** `npm run build`
+- **Output directory:** `dist`
 
-## Our vision
+Push changes to the configured deployment branch to trigger a deployment if automatic deployments are enabled.
 
-**Move incident response from alert to verified, reviewable change—with bounded autonomy, auditable evidence, and a human in control.**
+## Related project
 
-Built by **Team Zero-Ops** for the Google Hackathon.
+The landing page is only the presentation layer. Visit the main repository for the actual AutoSRE implementation, architecture, setup instructions, agent workflow, safety controls, and tests.
+
+**[Explore AutoSRE →](https://github.com/shv-codes/zero-ops-autosre)**
+
+## License
+
+Refer to the main project's licensing terms and any license files included in this repository.
 
