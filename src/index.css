@@ -1,0 +1,129 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Geist Variable', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SFMono-Regular', monospace;
+  --color-bg: #07080a;
+  --color-panel: #101114;
+  --color-panel-2: #17191d;
+  --color-line: #ffffff14;
+  --color-line-strong: #ffffff29;
+  --color-ink: #f4f4f5;
+  --color-muted: #a1a1aa;
+  --color-faint: #8b8b95;
+  --color-good: #3ecf8e;
+  --color-warn: #e2b340;
+  --color-bad: #f07178;
+}
+
+html {
+  scroll-behavior: smooth;
+  background: var(--color-bg);
+  color: var(--color-ink);
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -0.011em;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+::selection {
+  background: #3ecf8e;
+  color: #062116;
+}
+
+:focus-visible {
+  outline: 2px solid #f4f4f5;
+  outline-offset: 2px;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+summary {
+  cursor: pointer;
+}
+
+section[id],
+h2[id],
+div[id] {
+  scroll-margin-top: 88px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2c2c31;
+  border: 2px solid #07080a;
+  border-radius: 99px;
+}
+
+@keyframes drift {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.instrument-spin {
+  transform-origin: 100px 100px;
+  animation: drift 42s linear infinite;
+}
+
+.instrument-spin-rev {
+  transform-origin: 100px 100px;
+  animation: drift 28s linear infinite reverse;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .instrument-spin,
+  .instrument-spin-rev {
+    animation: none;
+  }
+}
+
+@media print {
+  body {
+    background: white !important;
+    color: #111 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-sheet {
+    background: white !important;
+    color: #111 !important;
+    border-color: #ddd !important;
+    box-shadow: none !important;
+  }
+
+  .print-sheet * {
+    color: #111 !important;
+  }
+}
